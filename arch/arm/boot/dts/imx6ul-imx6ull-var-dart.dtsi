@@ -189,14 +189,14 @@
 		>;
 	};
 
-	pinctrl_uart2: uart2grp {
+	/*pinctrl_uart2: uart2grp {
 		fsl,pins = <
 			MX6UL_PAD_UART2_TX_DATA__UART2_DCE_TX	0x1b0b1
 			MX6UL_PAD_UART2_RX_DATA__UART2_DCE_RX	0x1b0b1
 			MX6UL_PAD_UART2_CTS_B__UART2_DCE_CTS	0x1b0b1
 			MX6UL_PAD_UART2_RTS_B__UART2_DCE_RTS	0x1b0b1
 		>;
-	};
+	};*/
 };
 
 &pxp {
@@ -228,9 +228,9 @@
 };
 
 /* Bluetooth UART */
-&uart2 {
+/*&uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
 	uart-has-rtscts;
 	status = "okay";
-};
+};*/
