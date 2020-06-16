@@ -25,9 +25,36 @@
 		pinctrl-0 = <&pinctrl_gpio_keys>;
 
 		user {
+			/*GPIO switch button on EVK*/
 			gpios = <&gpio1 0 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_BACK>;
-			gpio-key,wakeup;
+                        //gpios = <&gpio2 11 GPIO_ACTIVE_LOW>;
+                        
+		};
+		/*FootSwitch In*/
+                fswin {
+			gpios = <&gpio2 11 GPIO_ACTIVE_LOW>;
+		};
+		/*FootSwitch Up*/
+                fswup {
+			gpios = <&gpio1 26 GPIO_ACTIVE_LOW>;
+		};
+
+		/*FootSwitch Down*/
+                fswdown {
+			gpios = <&gpio4 24 GPIO_ACTIVE_LOW>;
+		};
+                /*FootSwitch Go*/
+                fswgo {
+			gpios = <&gpio1 27 GPIO_ACTIVE_LOW>;
+		};
+		/*Tray sensor */
+                tray {
+			gpios = <&gpio2 1 GPIO_ACTIVE_HIGH>;
+		};
+                
+		/*Pump Sensor */
+                pump {
+			gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
 		};
 	};
 
@@ -50,10 +77,25 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c1>;
 	status = "okay";
+	ilitek@41 {
+		compatible = "tchip,ilitek";
+		reg = <0x41>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ilitek_ts_gpio>;
+		interrupt-parent = <&gpio4>;
+                interrupts = <14 IRQ_TYPE_EDGE_FALLING>;
+		vdd-supply;
+		vcc_i2c-supply;
+                ilitek,irq-gpio = <&gpio4 14 GPIO_ACTIVE_LOW>;
+                ilitek,reset-gpio = <&gpio3 4 GPIO_ACTIVE_LOW>;
+                ilitek,vbus = "vcc_i2c";
+                ilitek,vdd = "vdd";
+                ilitek,name = "ilitek_i2c";
+        };	
 };
 
 &i2c2 {
-	ft5x06_ts@38 {
+	/*ft5x06_ts@38 {
 		compatible = "edt,edt-ft5x06";
 		reg = <0x38>;
 		pinctrl-names = "default";
@@ -65,19 +107,43 @@
 		touchscreen-inverted-x;
 		touchscreen-inverted-y;
 	};
+	*/
 
 	/* DS1337 RTC module */
-	rtc@0x68 {
+	/*rtc@0x68 {
 		compatible = "dallas,ds1337";
 		reg = <0x68>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_rtc>;
 		interrupt-parent = <&gpio5>;
 		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
-	};
+	};*/
+};
+
+/* DS1339 RTC module */
+&i2c3 {
+	clock_frequency = <400000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c3>;
+	status = "okay";
+        rtc@68 {
+		compatible = "dallas,ds1339";
+		reg = <0x68>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_rtc>;
+		interrupt-parent = <&gpio5>;
+		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
+	};	
 };
 
 &iomuxc {
+	/* Ilitek Touchscreen */
+        pinctrl_ilitek_ts_gpio: ilitek_ts_gpiogrp {
+		fsl,pins = <
+			MX6UL_PAD_NAND_CE1_B__GPIO4_IO14	0x80000000
+			MX6UL_PAD_LCD_RESET__GPIO3_IO04		0x80000000
+		>;			
+	};
 	
 
 	pinctrl_ft5x06_ts_gpio: ft5x06_ts_gpiogrp {
@@ -88,7 +154,13 @@
 
 	pinctrl_gpio_keys: gpio_keysgrp {
 		fsl,pins = <
-			MX6UL_PAD_GPIO1_IO00__GPIO1_IO00	0x17059 /* User Button */
+			//MX6UL_PAD_GPIO1_IO00__GPIO1_IO00	0x17059 /* User Button		active low      */
+			MX6UL_PAD_ENET2_TX_DATA0__GPIO2_IO11    0x17059 /* Foot Switch In 	active low	*/
+                        MX6UL_PAD_UART3_CTS_B__GPIO1_IO26	0x17059 /* Foot Switch Up 	active low	*/
+                        MX6UL_PAD_CSI_DATA03__GPIO4_IO24	0x17059 /* Foot Switch Down 	active low	*/
+                        MX6UL_PAD_UART3_RTS_B__GPIO1_IO27	0x17059 /* Foot Switch Go 	active low	*/
+			MX6UL_PAD_ENET1_RX_DATA1__GPIO2_IO01    0x17059 /* Tray sensor 		active high	*/
+			MX6UL_PAD_SNVS_TAMPER1__GPIO5_IO01      0x17059 /* Pump Sensor		active low	*/
 		>;
 	};
 
@@ -102,6 +174,13 @@
 		fsl,pins = <
 			MX6UL_PAD_UART4_TX_DATA__I2C1_SCL	0x4001b8b0
 			MX6UL_PAD_UART4_RX_DATA__I2C1_SDA	0x4001b8b0
+		>;
+	};
+
+	pinctrl_i2c3: i2c3grp {
+		fsl,pins = <
+			MX6UL_PAD_ENET2_RX_DATA0__I2C3_SCL	0x4001b8b0
+			MX6UL_PAD_ENET2_RX_DATA1__I2C3_SDA	0x4001b8b0
 		>;
 	};
 
@@ -152,8 +231,8 @@
 		fsl,pins = <
 			MX6UL_PAD_UART3_TX_DATA__UART3_DCE_TX	0x1b0b1
 			MX6UL_PAD_UART3_RX_DATA__UART3_DCE_RX	0x1b0b1
-			MX6UL_PAD_UART3_CTS_B__UART3_DCE_CTS	0x1b0b1
-			MX6UL_PAD_UART3_RTS_B__UART3_DCE_RTS	0x1b0b1
+			//MX6UL_PAD_UART3_CTS_B__UART3_DCE_CTS	0x1b0b1
+			//MX6UL_PAD_UART3_RTS_B__UART3_DCE_RTS	0x1b0b1
 		>;
 	};
 
@@ -213,7 +292,7 @@
 &uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;
-	fsl,uart-has-rtscts;
+	//fsl,uart-has-rtscts;
 	status = "okay";
 };
 
