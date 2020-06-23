@@ -77,7 +77,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c1>;
 	status = "okay";
-	/*ilitek@41 {
+	ilitek@41 {
 		compatible = "tchip,ilitek";
 		reg = <0x41>;
 		pinctrl-names = "default";
@@ -91,33 +91,11 @@
                 ilitek,vbus = "vcc_i2c";
                 ilitek,vdd = "vdd";
                 ilitek,name = "ilitek_i2c";
-        };*/	
+        };	
 };
 
 &i2c2 {
-	ft5x06_ts@38 {
-		compatible = "edt,edt-ft5x06";
-		reg = <0x38>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_ft5x06_ts_gpio>;
-		interrupt-parent = <&gpio3>;
-		interrupts = <4 0>;
-		touchscreen-size-x = <800>;
-		touchscreen-size-y = <480>;
-		touchscreen-inverted-x;
-		touchscreen-inverted-y;
-	};
-	
 
-	/* DS1337 RTC module */
-	/*rtc@0x68 {
-		compatible = "dallas,ds1337";
-		reg = <0x68>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_rtc>;
-		interrupt-parent = <&gpio5>;
-		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
-	};*/
 };
 
 /* DS1339 RTC module */
